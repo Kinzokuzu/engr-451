@@ -1,46 +1,44 @@
 function z = multit(x, y)
 % MULTIT Multiply x and y (i.e. .*) Ether x and y will both be sequence structures of one of them may be a number.
-    fill_count = max(x.offset, y.offset) - min(x.offset, y.offset);
+    if isnumeric(x)
+        z.data = x .* y.data;
+        z.offset = y.offset;
+        return
+    elseif isnumeric(y)
+        z.data = x.data .* y;
+        z.offset = x.offset;
+        return
 
-    pre_fill = [];
-    back_fill = [];
-
-    if x.offset > y.offset
-        pre_fill = [zeros(1, fill_count), x.data];
-
-        % make sure the two vectors are the same length
-        size_diff = length(pre_fill) - length(y.data);
-        if size_diff > 0
-            back_fill = [y.data, zeros(1, size_diff)];
-        elseif size_diff < 0
-            pre_fill = [pre_fill, zeros(1, -size_diff)];
-            back_fill = y.data;
-        end
-
-    elseif y.offset > x.offset
-        pre_fill = [zeros(1, fill_count), y.data];
-
-        size_diff = length(pre_fill) - length(x.data);
-        if size_diff > 0
-            back_fill = [x.data, zeros(1, size_diff)];
-        elseif size_diff < 0
-            pre_fill = [pre_fill, zeros(1, -size_diff)];
-            back_fill = x.data;
-        end
-
+    % case where x and y are both sequence structures
     else
-        size_diff = length(x.data) - length(y.data);
-        if size_diff > 0
-            pre_fill = x.data;
-            back_fill = [y.data, zeros(1, size_diff)];
-        elseif size_diff < 0
-            pre_fill = [x.data, zeros(1, -size_diff)];
-            back_fill = y.data;
-        else
-            pre_fill = x.data;
-            back_fill = y.data;
-        end
-    end
+        % make sure x and y are the same length
+        if x.offset > y.offset
+            % pad the front of x with zeros
+            x.data = [zeros(1, x.offset - y.offset), x.data];
 
-    z.data = pre_fill .* back_fill;
-    z.offset = min(x.offset, y.offset);
+            if length(x.data) > length(y.data)
+                % pad the end of y with zeros
+                y.data = [y.data, zeros(1, length(x.data) - length(y.data))];
+            elseif length(x.data) < length(y.data)
+                % pad the end of x with zeros
+                x.data = [x.data, zeros(1, length(y.data) - length(x.data))];
+            end
+
+        elseif x.offset < y.offset
+            % pad the front of y with zeros
+            y.data = [zeros(1, y.offset - x.offset), y.data];
+
+            if length(x.data) > length(y.data)
+                % pad the end of y with zeros
+                y.data = [y.data, zeros(1, length(x.data) - length(y.data))];
+            elseif length(x.data) < length(y.data)
+                % pad the end of x with zeros
+                x.data = [x.data, zeros(1, length(y.data) - length(x.data))];
+            end
+        end
+
+        % add the data
+        z.data = x.data .* y.data;
+        % set the offset to the minimum of the two
+        z.offset = min(x.offset, y.offset);
+    end
