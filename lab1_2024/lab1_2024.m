@@ -17,7 +17,7 @@ y.offset = 2;
 test_lab1_2024('addit(x, y)')
 test_lab1_2024('addit(y, x)')
 
-y.offset = 7;
+y.offset = 5;
 % test sub
 test_lab1_2024('subit(x, y)')
 test_lab1_2024('subit(y, x)')
