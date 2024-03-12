@@ -3,8 +3,8 @@ function h = rectfilt(N, wc)
 %     h = rectfilt(N, wc)
 %     returns filter of order N and cutoff wc
 %     based on rectangular window.  wc is in fractions of pi.
+    n = -((N-1)/2):((N-1)/2); % create n values to pass
+    w = wc*sinc(wc*n);        % through sinc function
 
-    h = ones(1, (2*wc)+1)
-    r = length(h) - N;
-
+    h = w / sum(w); % normalize
 end
