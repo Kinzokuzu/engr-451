@@ -5,11 +5,12 @@ function h = kaiserfilt(N, wc, beta)
     % wc is in fractions of pi.
 
     n = -((N-1)/2):((N-1)/2); % create n values to pass
-    w = wc*sinc(wc*n);        % through sinc function
+    h = wc*sinc(wc*n);        % through sinc function
 
-    h = besseli(1, beta .* sqrt(1-(2 .* n / (N-1)).^2)) ./ besseli(1, beta); % kaiser window
+    w = besseli(1, beta .* (1 - (2.*(n - (N-1)/2)/(N-1).^2).^0.5)) ./ besseli(1, beta);
 
+    % Filtering h[n]*[n]
     h = h .* w;
-    h = sum(h) / h;
+    h = h / sum(h);
 
 end

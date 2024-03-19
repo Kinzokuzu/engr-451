@@ -8,9 +8,9 @@ function [N, beta] = kaiserparams(deltaOmega, delta)
     % Note: deltaOmega is given as a fraction of pi.
     % Test: [37, 5.6533] = kaiserparams(0.2, 0.001)
 
-    A = mag2db(delta);
+    A = -20 * log10(delta);
 
-    N = ceil((A - 8) / (2.285 * deltaOmega));
+    N = ceil((A - 8) / (2.285 * deltaOmega * pi));
 
     % calculating beta
     if A > 50
@@ -18,5 +18,5 @@ function [N, beta] = kaiserparams(deltaOmega, delta)
     elseif A < 21
         beta = 0;
     else
-        beta = 0.5842 * (A - 21)^0.4 + 0.07886 * (A - 21); 
+        beta = (0.5842 * (A - 21)^0.4) + (0.07886 * (A - 21)); 
     end
