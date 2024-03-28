@@ -21,10 +21,6 @@ function [sr, sc] = separate(s, fs)
     highPassFilt = rectfilt(N, 1) - kaiserfilt(N, 0.26, beta);
 
     %  Perform filtering
-    sr = filter(lowPassFilt, 1, s);
-    sc = filter(highPassFilt, 1, s);
-
-    sound(sr, fs);
-    pause();
-    sound(sc, fs);
+    sr = conv(s, lowPassFilt);
+    sc = conv(s, highPassFilt);
 end

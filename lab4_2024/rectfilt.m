@@ -6,5 +6,7 @@ function h = rectfilt(N, wc)
     n = -((N-1)/2):((N-1)/2); % create n values to pass
     h = wc*sinc(wc*n);        % through sinc function
 
+    w = ones(1, N); % create rectangular window
+    h = h .* w; % apply window to sinc function
     h = h / sum(h); % normalize
 end

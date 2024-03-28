@@ -7,7 +7,7 @@ function h = kaiserfilt(N, wc, beta)
     n = -((N-1)/2):((N-1)/2); % create n values to pass
     h = wc*sinc(wc*n);        % through sinc function
 
-    w = besseli(1, beta .* (1 - (2.*(n - (N-1)/2)/(N-1).^2).^0.5)) ./ besseli(1, beta);
+    w = besseli(0,beta*sqrt(1-(((0:N-1)-(N-1)/2)/((N-1)/2)).^2))/besseli(0,beta);
 
     % Filtering h[n]*[n]
     h = h .* w;
