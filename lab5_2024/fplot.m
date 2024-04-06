@@ -24,16 +24,19 @@ function fplot(b, a)
     w = linspace(0, pi, N/2+1);
     H = fft(b, N) ./ fft(a, N);
 
-    tiledlayout(2, 1);
-
-    nexttile
+    subplot(2, 1, 1);
     plot(w ./ pi, abs(H(1:N/2+1)));
     ylabel('|X(\omega)|');
 
-    nexttile
+    subplot(2, 1, 2);
     phase = round(angle(H(1:N/2+1))/pi, 4);
     plot(w ./ pi, phase);
     ylabel('\angleX(\omega)');
     xlabel('\omega(rad/\pi)');
+
+    hold on;
+    ylim([-1 1]);
+    yline(0, '-');
+    hold off;
 
 end
