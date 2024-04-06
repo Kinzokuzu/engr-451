@@ -15,8 +15,8 @@ function zplot(b, a)
     axis equal;
     hold on;
 
+    % if the length of the vectors are not equal, pad the shorter vector with zeros
     max_len = max(length(b), length(a));
-
     if length(b) < max_len
         b = [b, zeros(1, max_len - length(b))];
     elseif length(a) < max_len
@@ -26,8 +26,24 @@ function zplot(b, a)
     z = roots(b); % zeros
     p = roots(a); % poles
 
+    % find the maximum value of the zeros and poles
+    max_val = max([max(abs(real(z))), max(abs(imag(z))), max(abs(real(p))), max(abs(imag(p)))]) * 1.1;
+
+    % if the maximum value is less than 1, set it to 1
+    if max_val < 1
+        max_val = 1;
+    end
+
+    % set the axis limits
+    axis([-max_val, max_val, -max_val, max_val]);
+    % plot the x & y axes through the origin
+    graph = plot([-max_val max_val],[0 0], 'black');
+    graph = plot([0 0], [-max_val max_val], 'black');
+    
     % plot zeros
-    scatter(real(z), imag(z), 'o', 'blue');
+    scatter(real(z), imag(z), max_val * 125, 'o', 'blue'); % max_val * 125 in order to scale markers
     % plot poles
-    scatter(real(p), imag(p), 'x', 'red');
+    scatter(real(p), imag(p), max_val * 125, 'x', 'red');
+
+    hold off;
 end
