@@ -30,8 +30,8 @@ function zplot(b, a)
     max_val = max([max(abs(real(z))), max(abs(imag(z))), max(abs(real(p))), max(abs(imag(p)))]) * 1.1;
 
     % if the maximum value is less than 1, set it to 1
-    if max_val < 1
-        max_val = 1;
+    if max_val < 1.1
+        max_val = 1.1;
     end
 
     % set the axis limits

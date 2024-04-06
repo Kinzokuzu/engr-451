@@ -15,34 +15,25 @@ function fplot(b, a)
 
     if length(b) == 1
         b = [b 0];
+    end
     if length(a) == 1
         a = [a 0];
     end
 
-    N = 512;                   % number of points to graph
-    n = linspace(0,1,N/2);     % this is the x axis for the plot
-    Hz = fft(b, N) ./ fft(a,N);
+    N = 512;
+    w = linspace(0, pi, N/2+1);
+    H = fft(b, N) ./ fft(a, N);
 
-   
-    % this part plots the magnitude subplot
-    subplot(2,1,1);
-    plot(n, abs(Hz(1:N/2)));
-    xlim([0 1]);
-    ylim([0 max(abs(Hz(1:N/2)))]);
-    ylabel('|H(\omega)|');
-    set(gca, 'XTick', []);
+    tiledlayout(2, 1);
 
-    % this part plots the phase subplot
-    subplot(2,1,2);
-    x = round(Hz(1:N/2), 5);
-    phase = round(angle(x)/pi,4); % this rounding fixes the phase jumping issue
-    plot(n, phase);
-    hold on;
-    plot([0 1], [0 0], 'black')
-    hold off;
-    xlim([0 1]);
-    ylim([-1,1]);
-    ylabel('< H(\omega) (fractions of \pi)');
-    xlabel('\omega (fractions of \pi)');
+    nexttile
+    plot(w ./ pi, abs(H(1:N/2+1)));
+    ylabel('|X(\omega)|');
+
+    nexttile
+    phase = round(angle(H(1:N/2+1))/pi, 4);
+    plot(w ./ pi, phase);
+    ylabel('\angleX(\omega)');
+    xlabel('\omega(rad/\pi)');
 
 end
