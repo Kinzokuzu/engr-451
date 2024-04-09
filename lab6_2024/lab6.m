@@ -34,4 +34,5 @@ notch_filter = designfilt('bandstopiir','FilterOrder',2, ...
     'HalfPowerFrequency1',freq-BW,'HalfPowerFrequency2',freq+BW, ...
     'DesignMethod','butter','SampleRate',fs);
 
-y = filter(notch_filter, x);
+[b, a] = tf(notch_filter);
+y = filter(b, a, x);
