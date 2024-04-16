@@ -1,3 +1,5 @@
+function [b, a] = filtprogram()
+
 [x, fs] = audioread('persevere_bad.wav');
 
 % chunck data into frames
@@ -22,7 +24,7 @@ avg_fft = mean(abs(fft_frames).^2);
 
 % plot the average fft
 % figure;
-% plot(avg_fft(500:2000));
+%plot(avg_fft(500:2000));
 
 [mag, freq]= max(abs(avg_fft(500:2000)));
 freq = freq + 500;
@@ -32,7 +34,37 @@ BW = 50;
 
 notch_filter = designfilt('bandstopiir','FilterOrder',2, ...
     'HalfPowerFrequency1',freq-BW,'HalfPowerFrequency2',freq+BW, ...
-    'DesignMethod','butter','SampleRate',fs);
+    'DesignMethod','butter','SampleRate', fs);
 
 [b, a] = tf(notch_filter);
 y = filter(b, a, x);
+
+%sketch of pole zero plot that removes the tones 
+pos=[-1 -1 2 2];
+
+hold on
+grid on
+axis equal
+
+rectangle('Position',pos,'Curvature',[1 1])
+
+temp1=length(b)-length(a);
+temp2=length(a)-length(b);
+
+%poles
+h=[a zeros(1, temp1)];
+p=roots(h);
+
+%zeros
+g=[b zeros(1, temp2)];
+z=roots(g);
+
+plot(real(p),imag(p),'x','MarkerSize',8,'Color','r')
+plot(real(z),imag(z),'o','MarkerSize',8,'Color','b')
+
+poleRad = angle(p)
+zeroRad = angle(z)
+
+poleDeg = rad2deg(poleRad)
+zeroDeg = rad2deg(zeroRad)
+end
