@@ -40,27 +40,39 @@ notch_filter = designfilt('bandstopiir','FilterOrder',2, ...
 y = filter(b, a, x);
 
 %sketch of pole zero plot that removes the tones 
-pos=[-1 -1 2 2];
+rectangle('Position', [-1, -1, 2, 2], 'Curvature', [1, 1]);
+axis equal;
+hold on;
 
-hold on
-grid on
-axis equal
+% if the length of the vectors are not equal, pad the shorter vector with zeros
+max_len = max(length(b), length(a));
+if length(b) < max_len
+    b = [b, zeros(1, max_len - length(b))];
+elseif length(a) < max_len
+    a = [a, zeros(1, max_len - length(a))];
+end
 
-rectangle('Position',pos,'Curvature',[1 1])
+z = roots(b); % zeros
+p = roots(a); % poles
 
-temp1=length(b)-length(a);
-temp2=length(a)-length(b);
+% find the maximum value of the zeros and poles
+max_val = max([max(abs(real(z))), max(abs(imag(z))), max(abs(real(p))), max(abs(imag(p)))]) * 1.1;
 
-%poles
-h=[a zeros(1, temp1)];
-p=roots(h);
+% if the maximum value is less than 1, set it to 1
+if max_val < 1.1
+    max_val = 1.1;
+end
 
-%zeros
-g=[b zeros(1, temp2)];
-z=roots(g);
+% set the axis limits
+axis([-max_val, max_val, -max_val, max_val]);
+% plot the x & y axes through the origin
+graph = plot([-max_val max_val],[0 0], 'black');
+graph = plot([0 0], [-max_val max_val], 'black');
 
-plot(real(p),imag(p),'x','MarkerSize',8,'Color','r')
-plot(real(z),imag(z),'o','MarkerSize',8,'Color','b')
+% plot zeros
+scatter(real(z), imag(z), max_val * 125, 'o', 'blue'); % max_val * 125 in order to scale markers
+% plot poles
+scatter(real(p), imag(p), max_val * 125, 'x', 'red');
 
 poleRad = angle(p)
 zeroRad = angle(z)
