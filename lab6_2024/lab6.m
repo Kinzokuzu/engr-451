@@ -1,8 +1,9 @@
-function [b, a] = filtprogram()
-
+% reading in the audio file
+% x: audio data
+% fs: sampling frequency
 [x, fs] = audioread('persevere_bad.wav');
 
-% chunck data into frames
+% chunck data into frames with zero overlap
 frames = [];
 for i = 1:length(x)/fs
     l_bound = (i-1)*fs + 1;
@@ -19,30 +20,23 @@ end
 % only keep the first half of the fft
 fft_frames = fft_frames(:, 1:length(fft_frames(1, :))/2);
 
-% find average fft
+% find the average of the fft's energy
 avg_fft = mean(abs(fft_frames).^2);
 
-% plot the average fft
-% figure;
-%plot(avg_fft(500:2000));
-
+% finding the frequency of the maximum energy
+% mag: magnitude of the maximum energy, actual maximum energy
+% freq: frequency of the maximum energy, index of the maximum energy
 [mag, freq]= max(abs(avg_fft(500:2000)));
-freq = freq + 500;
-
-% need to redo this on our own
+freq = freq + 500; % adding in the offset
 BW = 50;
 
 notch_filter = designfilt('bandstopiir','FilterOrder',2, ...
     'HalfPowerFrequency1',freq-BW,'HalfPowerFrequency2',freq+BW, ...
     'DesignMethod','butter','SampleRate', fs);
 
+% extract the poles and zeros of the notch filter
 [b, a] = tf(notch_filter);
 y = filter(b, a, x);
-
-%sketch of pole zero plot that removes the tones 
-rectangle('Position', [-1, -1, 2, 2], 'Curvature', [1, 1]);
-axis equal;
-hold on;
 
 % if the length of the vectors are not equal, pad the shorter vector with zeros
 max_len = max(length(b), length(a));
@@ -54,6 +48,32 @@ end
 
 z = roots(b); % zeros
 p = roots(a); % poles
+
+% printing deliverables
+freq = freq
+
+poleRad = angle(p)
+zeroRad = angle(z)
+
+poleDeg = rad2deg(poleRad)
+zeroDeg = rad2deg(zeroRad)
+
+length(avg_fft)
+
+% everything below this point is for plotting
+figure;
+
+% plot the average energy of the combined frames
+subplot(2, 1, 1);
+plot(avg_fft); % this range was chosen by visually inspecting the plot
+title('Average energy of the combined frames');
+
+% sketch of pole zero plot that removes the tones 
+subplot(2, 1, 2);
+title('Pole Zero Plot');
+rectangle('Position', [-1, -1, 2, 2], 'Curvature', [1, 1]);
+axis equal;
+hold on;
 
 % find the maximum value of the zeros and poles
 max_val = max([max(abs(real(z))), max(abs(imag(z))), max(abs(real(p))), max(abs(imag(p)))]) * 1.1;
@@ -73,10 +93,3 @@ graph = plot([0 0], [-max_val max_val], 'black');
 scatter(real(z), imag(z), max_val * 125, 'o', 'blue'); % max_val * 125 in order to scale markers
 % plot poles
 scatter(real(p), imag(p), max_val * 125, 'x', 'red');
-
-poleRad = angle(p)
-zeroRad = angle(z)
-
-poleDeg = rad2deg(poleRad)
-zeroDeg = rad2deg(zeroRad)
-end
