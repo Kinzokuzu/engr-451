@@ -6,42 +6,48 @@ function str = dtmfdecode(s, fs)
 %            Produces a string transcript that decodes the tones.
 
     % chunck the signal into 10ms windows
-    wl = fs / 100;
+    wl = fs * 0.01; % window length
     windows = [];
     for i = 1:length(s)/wl
         l_bound = (i-1)*wl + 1;
         r_bound = i*wl;
+        % append the current window as a row
         windows = [windows; s(l_bound:r_bound)'];
     end
 
     % calculate energy of each window
     energies = floor(sum(windows.^2, 2));
-    max_energy = max(energies);
+    max_energy = max(energies); % used for reference
 
-    % if the energy of a window is less than 10 of the max energy, discard it
-    tones = [];
-    temp = [];
+    % find the tones by looking for windows with high energy
+    tones = []; % holds all tones
+    temp = []; % holds the current tone
     for i = 1:length(energies)
-        if energies(i) > max_energy - 10
-            % append to temp to make a tone
+        % if the energy is within 50% of the max energy then
+        % it is a tone
+        if energies(i) > max_energy * 0.5 
+            % append to temp to make a single tone
             temp = [temp, windows(i, :)];
         elseif length(temp) > 0
+            % append the temporary tone as a row
             tones = [tones; temp];
             temp = [];
         end
     end
-    tones = [tones; temp];
+    tones = [tones; temp]; % append the last tone
 
+    % characters for the dtmf tones
     dtmf = ['1' '2' '3';...
             '4' '5' '6';...
             '7' '8' '9';...
             '*' '0' '#'];
 
+    % standard frequencies for the dtmf tones
     row_freqs = [697, 770, 852, 941];
     col_freqs = [1209, 1336, 1477];
 
-    % convert to indices
     tone_length = length(tones(1, :));
+    % frequencies as indices
     row_freqs = round(row_freqs * tone_length / fs) + 1;
     col_freqs = round(col_freqs * tone_length / fs) + 1;
 
