@@ -4,6 +4,8 @@ function str = dtmfdecode(s, fs)
 %            Accepts a array, s, which corresponds to the DTMF tones
 %            sampled at fs.
 %            Produces a string transcript that decodes the tones.
+%
+% Authors: Saul J. Cervantes-Hernandez, Jose A. Leandro
 
     % chunck the signal into 10ms windows
     wl = fs * 0.01; % window length
@@ -24,7 +26,7 @@ function str = dtmfdecode(s, fs)
     temp = []; % holds the current tone
     for i = 1:length(energies)
         % if the energy is within 50% of the max energy then
-        % it is a tone
+        % assume it is a tone
         if energies(i) > max_energy * 0.5 
             % append to temp to make a single tone
             temp = [temp, windows(i, :)];
